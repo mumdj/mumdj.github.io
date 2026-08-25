@@ -617,6 +617,69 @@ if(!settings.apiKey){
   if(d && d.apiKey) settings = Object.assign(settings, d);
 }
 let adminMode = false;
+
+
+const RECORDS_API_URL = 'https://mumdj.github.io/';
+
+async function apiListRecords(c1, c2) {
+  if (!RECORDS_API_URL || RECORDS_API_URL.includes('https://mumdj.github.io/')) {
+    return [];
+  }
+
+  try {
+    const url = new URL(RECORDS_API_URL);
+    url.searchParams.set('action', 'list');
+
+    if (c1) url.searchParams.set('c1', c1);
+    if (c2) url.searchParams.set('c2', c2);
+
+    const res = await fetch(url.toString(), {
+      method: 'GET'
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      console.warn('이력 불러오기 실패:', data.error || data);
+      return [];
+    }
+
+    return Array.isArray(data.records) ? data.records : [];
+  } catch (err) {
+    console.warn('공용 이력 불러오기 오류:', err);
+    return [];
+  }
+}
+
+async function apiSaveRecord(record) {
+  if (!RECORDS_API_URL || RECORDS_API_URL.includes('https://mumdj.github.io/')) {
+    return null;
+  }
+
+  try {
+    const res = await fetch(RECORDS_API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'save',
+        record: record
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      console.warn('공용 이력 저장 실패:', data.error || data);
+      return null;
+    }
+
+    return data.record || record;
+  } catch (err) {
+    console.warn('공용 이력 저장 오류:', err);
+    return null;
+  }
+}
+
+
 let records  = LS.get('records', []);
 let lastOwner= LS.get('lastOwner','');
 let mi = LS.get('modelIndex',0); if(mi<0||mi>=DATA.length) mi=0;
@@ -1964,6 +2027,17 @@ function saveEntry(){
     if(i>=0){ rec.작성시각=records[i].작성시각; rec.수정시각=new Date().toISOString(); records[i]=rec; } }
   else records.push(rec);
   lastOwner=owner; LS.set('lastOwner',lastOwner); LS.set('records',records);
+  
+  // 공용 이력 저장: Google Apps Script / Google Sheets로 전송
+  apiSaveRecord(rec).then(function(saved){
+    if(saved){
+      console.log('공용 이력 저장 완료', saved);
+    }
+  }).catch(function(err){
+    console.warn('공용 이력 저장 실패', err);
+  });
+
+
   dlgClose($('#dlgEntry')); updateRecCount();
   if(!$('#detail').classList.contains('hidden') && entryCtx.code) openDetail(entryCtx.code,entryCtx.cls);
   else renderRecords();

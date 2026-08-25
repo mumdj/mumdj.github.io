@@ -2028,6 +2028,10 @@ function saveEntry(){
   else records.push(rec);
   lastOwner=owner; LS.set('lastOwner',lastOwner); LS.set('records',records);
   
+  
+  console.log('saveEntry 여기까지 실행됨', rec);
+  alert('공용 저장 코드 위치까지 왔습니다');
+
   // 공용 이력 저장: Google Apps Script / Google Sheets로 전송
   apiSaveRecord(rec).then(function(saved){
     if(saved){

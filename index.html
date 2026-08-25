@@ -1,6 +1,5 @@
-﻿<!doctype html>
-<html lang="ko">
-<head>
+<!doctype html>
+<html lang="ko"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DY 세차기 에러코드 조회 v11</title>
@@ -314,8 +313,14 @@ window.addEventListener('error',function(e){
         <p class="lead" style="margin-top:0"><b>전표 전체를 그대로 붙여넣으세요.</b> 조회 결과에
           <b>그때 켜져 있던 센서·출력</b>, <b>사용금지된 유니트</b>, 유니트 완료, 세차 정보까지 함께 나옵니다.
           하단 <b>* 입출력 정보 *</b> 만 넣어도 됩니다. 사진으로 읽으면 자동으로 채워집니다.</p>
-        <textarea id="ioHex" class="hex" rows="6" spellcheck="false"
-          placeholder="1)입력:CF-00-38-0D-F9-00-06-00&#10;      :00-00-00-00&#10;  출력:00-00-00-00-01-00-00-58&#10;      :E9-0C-06-00&#10;2)입력:7E-00-03-08-7E-FE-00-00&#10;      :00-00-00-00&#10;  출력:00-00-00-00-29-08-15-00&#10;      :00-00-00-00"></textarea>
+        <textarea id="ioHex" class="hex" rows="6" spellcheck="false" placeholder="1)입력:CF-00-38-0D-F9-00-06-00
+      :00-00-00-00
+  출력:00-00-00-00-01-00-00-58
+      :E9-0C-06-00
+2)입력:7E-00-03-08-7E-FE-00-00
+      :00-00-00-00
+  출력:00-00-00-00-29-08-15-00
+      :00-00-00-00"></textarea>
         <button class="btn ghost wide" type="button" id="btnHexClear" style="margin-top:8px">지우기</button>
       </div>
     </details>
@@ -328,8 +333,8 @@ window.addEventListener('error',function(e){
       <button class="btn ghost hidden" type="button" id="btnLiveCam" style="flex:1 1 46%">🎥 화면 보며 찍기</button>
     </div>
     <!-- v5: 한 화면·한 전표가 사진 한 장에 안 들어온다. 전 모델·전 기기에서 여러 장을 한 번에 받는다. -->
-    <input id="photoCam"  type="file" accept="image/*" capture="environment" multiple class="hidden">
-    <input id="photoFile" type="file" accept="image/*" multiple class="hidden">
+    <input id="photoCam" type="file" accept="image/*" capture="environment" multiple="" class="hidden">
+    <input id="photoFile" type="file" accept="image/*" multiple="" class="hidden">
     <div id="camMsg"></div>
     <div class="muted" id="photoState" style="margin-top:6px;font-size:12px">
       에러 화면을 찍으면 코드를 읽어 자동 입력합니다. <b>인터넷과 API 키 필요</b>(설정).
@@ -338,7 +343,7 @@ window.addEventListener('error',function(e){
     <!-- 라이브 카메라 -->
     <div id="camWrap" class="hidden" style="margin-top:10px">
       <div style="position:relative;border-radius:10px;overflow:hidden;background:#000">
-        <video id="cam" playsinline muted style="width:100%;display:block"></video>
+        <video id="cam" playsinline="" muted="" style="width:100%;display:block"></video>
         <!-- 에러코드 영역을 맞추도록 안내하는 가이드 프레임 -->
         <div style="position:absolute;inset:12% 8%;border:2px dashed rgba(255,255,255,.85);border-radius:8px;
                     pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.25)"></div>
@@ -434,7 +439,7 @@ window.addEventListener('error',function(e){
       <b style="color:var(--ok)">인식한 정보를 함께 저장합니다</b>
       <div id="entryIoSum" style="font-size:13px"></div>
       <label style="display:flex;gap:9px;align-items:flex-start;margin-top:9px;font-size:13px;line-height:1.5">
-        <input type="checkbox" id="f_io" checked style="width:18px;height:18px;flex:0 0 auto;margin-top:2px">
+        <input type="checkbox" id="f_io" checked="" style="width:18px;height:18px;flex:0 0 auto;margin-top:2px">
         <span style="flex:1">이 기록에 <b>위 정보를 모두</b> 같이 남기기
           <small class="muted" style="display:block">나중에 같은 증상이 났을 때 그때 상태가 어땠는지 비교할 수 있습니다. 엑셀로 뽑을 때도 함께 나갑니다.</small></span>
       </label>
@@ -450,7 +455,7 @@ window.addEventListener('error',function(e){
 <dialog id="dlgImport"><div class="dlg">
   <h3>다른 담당자 기록 가져오기</h3>
   <p class="lead">상대방이 "JSON 내보내기"로 복사한 내용을 붙여넣으세요. 같은 기록은 중복 저장되지 않습니다.</p>
-  <textarea id="importText" rows="8" placeholder='{"기록":[ ... ]}'></textarea>
+  <textarea id="importText" rows="8" placeholder="{&quot;기록&quot;:[ ... ]}"></textarea>
   <div id="importMsg" class="muted" style="margin-top:9px"></div>
   <div style="display:flex;gap:8px;margin-top:12px">
     <button class="btn ghost" type="button" id="btnImportCancel" style="flex:1">닫기</button>
@@ -513,7 +518,7 @@ window.addEventListener('error',function(e){
     <label class="fld" for="cfgPin">관리자 PIN <span class="muted" style="font-weight:400">— 비우면 묻지 않습니다</span></label>
     <input id="cfgPin" type="text" inputmode="numeric" autocomplete="off" placeholder="예) 4907">
     <label style="display:flex;gap:9px;align-items:flex-start;margin-top:11px;font-size:13.5px;line-height:1.5">
-      <input type="checkbox" id="cfgHide" checked style="width:18px;height:18px;flex:0 0 auto;margin-top:2px">
+      <input type="checkbox" id="cfgHide" checked="" style="width:18px;height:18px;flex:0 0 auto;margin-top:2px">
       <span style="flex:1">현장 담당자에게 <b>관리자 버튼 숨기기</b> (권장)</span>
     </label>
   </div>
@@ -561,7 +566,7 @@ window.addEventListener('error',function(e){
    기기 메모리가 모자라 못 뜨면 null 이 되고, '배포용 파일 만들기'만 막힌다. */
 let PRISTINE = null;
 
-const ADMIN_CONFIG = {"v":1,"k":"","model":"","mode":"auto","base":"","vmode":"","how":"","pin":"","hide":false}; /* 관리자 설정 자리 — 배포용 파일을 만들 때 이 줄이 통째로 바뀝니다 */
+const ADMIN_CONFIG = {"v":1,"k":"BQgDBDV5AQYbeHReXysvTnUWLjQkGAZ1ekMtMXQaFis+eBoBf21MMw1fEjULa3hhVFdqVwU=","model":"gemini-3.5-flash-lite","mode":"auto","base":"","vmode":"interactions","how":"header","pin":"dWsecQ==","hide":true}; /* 관리자 설정 자리 — 배포용 파일을 만들 때 이 줄이 통째로 바뀝니다 */
 
 const DESIGN = 'a';   // v2는 A안(요약+접이식) 발전형
 
@@ -3070,6 +3075,4 @@ window.__boot = function(html){
     fail('앱이 중간에 멈췄습니다','오류: '+((e&&e.message)||e));
   }
 })();
-</script>
-</body>
-</html>
+</script></body></html>

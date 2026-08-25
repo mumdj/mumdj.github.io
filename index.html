@@ -680,6 +680,33 @@ async function apiSaveRecord(record) {
 }
 
 
+function mergeRecordsById(localList, onlineList) {
+  const map = new Map();
+
+  (localList || []).forEach(function(r) {
+    if (!r) return;
+    const id = String(r.id || '');
+    if (id) {
+      map.set(id, r);
+    } else {
+      map.set('local_' + Math.random(), r);
+    }
+  });
+
+  (onlineList || []).forEach(function(r) {
+    if (!r) return;
+    const id = String(r.id || '');
+    if (id) {
+      map.set(id, Object.assign({}, map.get(id) || {}, r));
+    } else {
+      map.set('online_' + Math.random(), r);
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+
 let records  = LS.get('records', []);
 let lastOwner= LS.get('lastOwner','');
 let mi = LS.get('modelIndex',0); if(mi<0||mi>=DATA.length) mi=0;
@@ -1189,7 +1216,7 @@ function secSource(m,c,io){
 }
 
 let curDetail=null;
-function openDetail(c,cls){
+async function openDetail(c,cls){
   const m=M(), pair=m.모델.구조==='pair';
   curDetail={c,cls};
   const sec=$('#detail'); sec.innerHTML='';
@@ -1215,8 +1242,34 @@ function openDetail(c,cls){
   const io = c.IO ? m._ioIn[c.IO] : null;
   const code = pair ? c.에러코드1 : c.코드;
   const field = (!pair && cls==='에러코드2') ? '에러코드2' : '에러코드1';
+
+  // 공용 이력 불러오기: 현재 상세 에러코드에 해당하는 이력을 Google Sheets에서 가져온다.
+  try {
+    let onlineRecords = [];
+
+    if (pair) {
+      // pair 구조 모델은 에러코드1, 에러코드2 조합으로 찾는다.
+      onlineRecords = await apiListRecords(c.에러코드1 || '', c.에러코드2 || '');
+    } else if (field === '에러코드2') {
+      // 단일 코드 구조에서 에러코드2로 열린 상세
+      onlineRecords = await apiListRecords('', code);
+    } else {
+      // 일반적인 에러코드1 상세
+      onlineRecords = await apiListRecords(code, '');
+    }
+
+    if (onlineRecords && onlineRecords.length) {
+      records = mergeRecordsById(records, onlineRecords);
+      LS.set('records', records);
+      updateRecCount();
+    }
+  } catch (err) {
+    console.warn('공용 이력 불러오기 실패', err);
+  }
+
   const mine = records.filter(r=>r.모델===m.모델.id && r[field]===code)
     .sort((a,b)=>String(b.에러발생시간).localeCompare(String(a.에러발생시간)));
+
   const hist = HISTORY.filter(h=>h.모델===m.모델.id && h[field]===code)
     .sort((a,b)=>String(b.에러발생시간).localeCompare(String(a.에러발생시간)));
 

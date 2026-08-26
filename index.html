@@ -622,11 +622,8 @@ let adminMode = false;
 const RECORDS_API_URL = 'https://script.google.com/macros/s/AKfycbwPBkEN0srU67a7taBmMLJ4cCkT0W_vGsk3H8Lpxrh3pRFBB29fYgZArlPXFJT1-5TX/exec';
 
 async function apiListRecords(c1, c2) {
-  console.log('[공용이력] apiListRecords 호출', {c1, c2, url: RECORDS_API_URL});
-
-
   if (!RECORDS_API_URL) {
-    return [];
+    return null;
   }
 
   try {
@@ -641,8 +638,6 @@ async function apiListRecords(c1, c2) {
     });
 
     const data = await res.json();
-    console.log('[공용이력] apiListRecords 응답', data);
-
 
     if (!data.ok) {
       console.warn('이력 불러오기 실패:', data.error || data);
@@ -655,6 +650,7 @@ async function apiListRecords(c1, c2) {
     return [];
   }
 }
+
 
 async function apiSaveRecord(record) {
   if (!RECORDS_API_URL) {
@@ -1252,15 +1248,6 @@ async function openDetail(c,cls){
   try {
     let onlineRecords = [];
 
-    console.log('[공용이력] 상세 열기', {
-      pair: pair,
-      field: field,
-      code: code,
-      c1: c.에러코드1,
-      c2: c.에러코드2,
-      modelId: m.모델.id
-    });
-
     if (pair) {
       onlineRecords = await apiListRecords(c.에러코드1 || '', '');
     } else if (field === '에러코드2') {
@@ -1269,27 +1256,17 @@ async function openDetail(c,cls){
       onlineRecords = await apiListRecords(code, '');
     }
 
-    console.log('[공용이력] 가져온 건수', onlineRecords.length);
-    console.log('[공용이력] 가져온 내용', onlineRecords);
-
     if (onlineRecords && onlineRecords.length) {
       records = mergeRecordsById(records, onlineRecords);
       LS.set('records', records);
       updateRecCount();
-
-      console.log('[공용이력] 병합 후 전체 records 건수', records.length);
     }
   } catch (err) {
     console.warn('공용 이력 불러오기 실패', err);
   }
-
   
   const mine = records.filter(r=>String(r.모델||'')===String(m.모델.id||'') && String(r[field]||'')===String(code||''))
     .sort((a,b)=>String(b.에러발생시간).localeCompare(String(a.에러발생시간)));
-
-  console.log('[공용이력] 화면 표시 대상 mine 건수', mine.length);
-  console.log('[공용이력] mine 내용', mine);
-
 
   const hist = HISTORY.filter(h=>h.모델===m.모델.id && h[field]===code)
     .sort((a,b)=>String(b.에러발생시간).localeCompare(String(a.에러발생시간)));
@@ -2104,14 +2081,9 @@ function saveEntry(){
   
   
   // 공용 이력 저장: Google Apps Script / Google Sheets로 전송
-  apiSaveRecord(rec).then(function(saved){
-    if(saved){
-      console.log('공용 이력 저장 완료', saved);
-    }
-  }).catch(function(err){
+  apiSaveRecord(rec).catch(function(err){
     console.warn('공용 이력 저장 실패', err);
   });
-
 
   dlgClose($('#dlgEntry')); updateRecCount();
   if(!$('#detail').classList.contains('hidden') && entryCtx.code) openDetail(entryCtx.code,entryCtx.cls);
